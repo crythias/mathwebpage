@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Big Screen Math Flash Cards</title>
+
+<style>
+  body {
+    font-family: sans-serif;
+    font-size: 48px;
+    text-align: center;
+  }
+
+  button {
+    font-size: 48px;
+    padding: 20px 40px;
+    margin: 10px;
+  }
+
+  .selected {
+    background: #ccc !important;
+  }
+
+  #problem {
+    font-size: 140px;
+    margin: 40px 0;
+  }
+
+  #boxes .row {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+  }
+
+  .box {
+    width: 60px;
+    height: 60px;
+    border: 3px solid black;
+    margin: 5px;
+  }
+
+  #numberline {
+    margin-top: 60px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Math Flash Cards</h1>
+
+<!-- Operation buttons -->
+<div>
+  <button class="op-btn" data-op="+" onclick="setOp('+')">+</button>
+  <button class="op-btn" data-op="-" onclick="setOp('-')">−</button>
+  <button class="op-btn" data-op="*" onclick="setOp('*')">×</button>
+  <button class="op-btn" data-op="/" onclick="setOp('/')">÷</button>
+</div>
+
+<!-- Digit mode -->
+<div>
+  <button class="digit-btn" data-digits="1" onclick="setDigits(1)">1‑digit</button>
+  <button class="digit-btn" data-digits="2" onclick="setDigits(2)">2‑digit</button>
+  <button class="digit-btn" data-digits="2.1" onclick="setDigits(2.1)">Mixed (2‑digit, 1‑digit)</button>
+  <button class="digit-btn" data-digits="3" onclick="setDigits(3)">3‑digit</button>
+  <button class="digit-btn" data-digits="3.1" onclick="setDigits(3.1)">Mixed (3‑digit, 1‑digit)</button>
+  <button class="digit-btn" data-digits="3.2" onclick="setDigits(3.2)">Mixed (3‑digit, 2‑digit)</button>
+</div>
+
+<!-- Box mode -->
+<div>
+  <button class="box-btn" data-box="0" onclick="setBoxes(0)">No Boxes</button>
+  <button class="box-btn" data-box="5" onclick="setBoxes(5)">5‑Boxes</button>
+  <button class="box-btn" data-box="10" onclick="setBoxes(10)">10‑Boxes</button>
+</div>
+
+<!-- Number line toggle -->
+<div>
+  <button class="line-btn" data-line="0" onclick="setNumberLine(0)">No Line</button>
+  <button class="line-btn" data-line="1" onclick="setNumberLine(1)">Number Line</button>
+</div>
+
+<!-- Problem -->
+<div id="problem"></div>
+
+<!-- Boxes -->
+<div id="boxes"></div>
+
+<!-- Number line -->
+<div id="numberline"></div>
+
+<!-- Answer -->
+<div>
+  <input id="answer" style="font-size:48px; width:300px;">
+  <button onclick="checkAnswer()">Check</button>
+</div>
+
+<button onclick="generate()">New Problem</button>
+
+<div id="feedback"></div>
+
+<script>
+let current = {
+  op: "+",
+  digits: 1,
+  boxmode: 0,
+  numberline: 0,
+  top: 0,
+  bottom: 0
+};
+
+function rand(n) {
+  return Math.floor(Math.random() * n);
+}
+
+function setOp(o) {
+  current.op = o;
+  document.querySelectorAll(".op-btn").forEach(btn =>
+    btn.classList.toggle("selected", btn.dataset.op === o)
+  );
+}
+
+function setDigits(d) {
+  current.digits = d;
+  document.querySelectorAll(".digit-btn").forEach(btn =>
+    btn.classList.toggle("selected", Number(btn.dataset.digits) === d)
+  );
+}
+
+function setBoxes(b) {
+  current.boxmode = b;
+  document.querySelectorAll(".box-btn").forEach(btn =>
+    btn.classList.toggle("selected", Number(btn.dataset.box) === b)
+  );
+  renderBoxes();
+}
+
+function setNumberLine(v) {
+  current.numberline = v;
+  document.querySelectorAll(".line-btn").forEach(btn =>
+    btn.classList.toggle("selected", Number(btn.dataset.line) === v)
+  );
+  renderNumberLine();
+}
+
+function renderProblem() {
+  document.getElementById("problem").innerHTML =
+    `${current.top} ${current.op} ${current.bottom}`;
+}
+
+function generate() {
+  let top, bottom;
+
+
+  switch (current.digits) {
+    case 1:
+      top = rand(10);
+      bottom = rand(10);
+      if (current.op === "/" && bottom === 0) {
+        bottom = rand(9) + 1;
+      }
+      break;
+    case 2:
+      top = rand(90) + 10;
+      bottom = rand(90) + 10;
+      break;
+    case 2.1:
+      top = rand(90) + 10;
+      bottom = rand(10);
+      if (current.op === "/" && bottom === 0) {
+        bottom = rand(9) + 1;
+      }
+      break;
+    case 3:
+      top = rand(900) + 100;
+      bottom = rand(90) + 10;
+      break;
+    case 3.1:
+      top = rand(900) + 100;
+      bottom = rand(10);
+      if (current.op === "/" && bottom === 0) {
+        bottom = rand(9) + 1;
+      }
+      break;
+    case 3.2:
+      top = rand(900) + 100;
+      bottom = rand(90) + 10;
+      break;
+
+    default:
+      top = rand(9) + 1;
+      bottom = rand(9) + 1;
+  }
+
+  // enforce no negative subtraction
+  if (current.op === "-" && bottom > top) {
+    [top, bottom] = [bottom, top];
+  }
+
+  current.top = top;
+  current.bottom = bottom;
+
+  renderProblem();
+
+  document.getElementById("answer").value = "";
+  document.getElementById("feedback").innerHTML = "";
+
+  document.getElementById("boxes").innerHTML = "";
+  if (current.boxmode !== 0) renderBoxes();
+
+  document.getElementById("numberline").innerHTML = "";
+  if (current.numberline === 1) renderNumberLine();
+}
+
+function checkAnswer() {
+  let correct;
+  switch (current.op) {
+    case "+": correct = current.top + current.bottom; break;
+    case "-": correct = current.top - current.bottom; break;
+    case "*": correct = current.top * current.bottom; break;
+    case "/": correct = current.top / current.bottom; break;
+  }
+
+  const user = Number(document.getElementById("answer").value);
+  document.getElementById("feedback").innerHTML =
+    user === correct ? "Correct!" : "Try again";
+}
+
+function renderBoxes() {
+  const div = document.getElementById("boxes");
+  div.innerHTML = "";
+
+  if (current.boxmode === 0) return;
+
+  let correct;
+  switch (current.op) {
+    case "+": correct = current.top + current.bottom; break;
+    case "-": correct = current.top - current.bottom; break;
+    case "*": correct = current.top * current.bottom; break;
+    case "/": correct = current.top / current.bottom; break;
+  }
+
+  const mode = current.boxmode;
+  const rows = Math.ceil(correct / mode);
+
+  for (let r = 0; r < rows; r++) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (let i = 0; i < mode; i++) {
+      const b = document.createElement("div");
+      b.className = "box";
+      row.appendChild(b);
+    }
+    div.appendChild(row);
+  }
+}
+
+function renderNumberLine() {
+  const div = document.getElementById("numberline");
+  div.innerHTML = "";
+  if (current.numberline === 0) return;
+
+  let correct;
+  switch (current.op) {
+    case "+": correct = current.top + current.bottom; break;
+    case "-": correct = current.top - current.bottom; break;
+    case "*": correct = current.top * current.bottom; break;
+    case "/": correct = current.top / current.bottom; break;
+  }
+
+  const low = Math.min(current.top, current.bottom, correct) - 2;
+  const high = Math.max(current.top, current.bottom, correct) + 2;
+
+  const start = low;
+  const end = high;
+  const range = end - start;
+
+  const step = range > 40 ? 5 : 1;
+
+  const line = document.createElement("div");
+  line.style.position = "relative";
+  line.style.height = "140px";
+  line.style.borderBottom = "6px solid black";
+  line.style.margin = "40px auto";
+  line.style.width = "90%";
+
+  for (let i = start; i <= end; i += step) {
+    const percent = (i - start) / range * 100;
+
+    const tick = document.createElement("div");
+    tick.style.position = "absolute";
+    tick.style.bottom = "0";
+    tick.style.left = `calc(${percent}% - 2px)`;
+    tick.style.width = "4px";
+    tick.style.height = "40px";
+    tick.style.background = "#000";
+
+    const label = document.createElement("div");
+    label.style.position = "absolute";
+    label.style.bottom = "-60px";
+    label.style.fontSize = "48px";
+    label.style.transform = "translateX(-50%)";
+    label.innerText = i;
+    tick.appendChild(label);
+
+    line.appendChild(tick);
+  }
+
+  div.appendChild(line);
+}
+</script>
+
+</body>
+</html>
