@@ -43,6 +43,11 @@
     margin-top: 60px;
   }
 
+  #NewProblem {
+  background: #4CAF50;
+  color: white;
+}
+ 
   #answerRow {
   display: flex;
   align-items: flex-start;
@@ -370,6 +375,14 @@ answer.addEventListener("focus", () => {
 
 document.addEventListener("click", (e) => {
   if (!tenkey.contains(e.target) && e.target !== answer) {
+    tenkey.classList.add("hidden");
+  }
+});
+document.addEventListener("mousedown", (e) => {
+  const clickedInsideTenkey = tenkey.contains(e.target);
+  const clickedAnswer = e.target === answer;
+
+  if (!clickedInsideTenkey && !clickedAnswer) {
     tenkey.classList.add("hidden");
   }
 });
