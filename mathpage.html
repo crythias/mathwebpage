@@ -43,19 +43,21 @@
     margin-top: 60px;
   }
 
-  #tenkey {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  #answerRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+#tenkey {
   display: grid;
-  grid-template-columns: repeat(3, 80px);
+  grid-template-columns: repeat(3, 60px);
   gap: 10px;
   background: #eee;
   padding: 15px;
   border-radius: 10px;
   box-shadow: 0 0 10px #0004;
-  z-index: 999;
 }
 
 #tenkey.hidden {
@@ -63,14 +65,15 @@
 }
 
 #tenkey button {
-  font-size: 32px;
-  padding: 20px;
+  font-size: 28px;
+  padding: 15px;
   border-radius: 8px;
 }
 
 #tenkey .wide {
   grid-column: span 2;
 }
+
 
 </style>
 </head>
@@ -119,33 +122,34 @@
 <!-- Number line -->
 <div id="numberline"></div>
 
-<!-- Tenkey -->
-<div id="tenkey" class="hidden">
-  <button data-key="7">7</button>
-  <button data-key="8">8</button>
-  <button data-key="9">9</button>
-  <button data-key="4">4</button>
-  <button data-key="5">5</button>
-  <button data-key="6">6</button>
-  <button data-key="1">1</button>
-  <button data-key="2">2</button>
-  <button data-key="3">3</button>
-  <button data-key="0" class="wide">0</button>
-  <button data-key="back">⌫</button>
-  <button data-key="clear">Clear</button>
-  <button data-key="enter">Enter</button>
+<div id="answerRow">
+
+  <!-- Tenkey on the left -->
+  <div id="tenkey" class="hidden">
+    <button data-key="7">7</button>
+    <button data-key="8">8</button>
+    <button data-key="9">9</button>
+    <button data-key="4">4</button>
+    <button data-key="5">5</button>
+    <button data-key="6">6</button>
+    <button data-key="1">1</button>
+    <button data-key="2">2</button>
+    <button data-key="3">3</button>
+    <button data-key="0" class="wide">0</button>
+    <button data-key="back">⌫</button>
+    <button data-key="clear">Clear</button>
+    <button data-key="enter">Enter</button>
+  </div>
+
+  <!-- Answer + buttons on the right -->
+  <div id="answerColumn">
+    <input id="answer" autocomplete="off" style="font-size:48px; width:300px;">
+    <button id="Check" onclick="checkAnswer()">Check</button>
+    <button id="NewProblem" onclick="generate()">New Problem</button>
+  </div>
+
 </div>
-
-<!-- Answer -->
-<div>
-  <input id="answer" style="font-size:48px; width:300px;">
-  <button onclick="checkAnswer()">Check</button>
-</div>
-
-<button onclick="generate()">New Problem</button>
-
-<div id="feedback"></div>
-
+<div id="feedback" style="margin-top: 20px; height: 60px;"></div>
 <script>
 let current = {
   op: "+",
